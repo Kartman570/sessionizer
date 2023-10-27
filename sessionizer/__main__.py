@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from .config import load
 from .runner import run_workspace
+from .doctor import doctor
 
 
 def main():
@@ -12,7 +13,7 @@ def main():
     parser.add_argument("--config", type=Path, default=Path.home() / ".config/sessionizer.json")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("list")
-    for name in ("show", "run"):
+    for name in ("show", "run", "doctor"):
         command = commands.add_parser(name)
         command.add_argument("name")
         if name == "run":
@@ -29,6 +30,10 @@ def main():
         if args.command == "show":
             print(json.dumps(project, indent=2))
             return 0
+        if args.command == "doctor":
+            issues = doctor(project)
+            print("\n".join(issues) if issues else "Workspace is ready")
+            return int(bool(issues))
         if args.timeout <= 0:
             raise ValueError("Timeout must be positive")
         results = run_workspace(project, args.timeout)
