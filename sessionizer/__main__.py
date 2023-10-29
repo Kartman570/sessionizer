@@ -6,6 +6,7 @@ from pathlib import Path
 from .config import load
 from .runner import run_workspace
 from .doctor import doctor
+from .tmux import tmux_workspace
 
 
 def main():
@@ -13,7 +14,7 @@ def main():
     parser.add_argument("--config", type=Path, default=Path.home() / ".config/sessionizer.json")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("list")
-    for name in ("show", "run", "doctor"):
+    for name in ("show", "run", "doctor", "tmux"):
         command = commands.add_parser(name)
         command.add_argument("name")
         if name == "run":
@@ -30,6 +31,9 @@ def main():
         if args.command == "show":
             print(json.dumps(project, indent=2))
             return 0
+        if args.command == "tmux":
+            tmux_workspace(args.name, project)
+            return 0
         if args.command == "doctor":
             issues = doctor(project)
             print("\n".join(issues) if issues else "Workspace is ready")
@@ -41,7 +45,7 @@ def main():
     except subprocess.TimeoutExpired:
         print("Workspace command timed out", file=sys.stderr)
         return 124
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(str(error), file=sys.stderr)
         return 2
 
