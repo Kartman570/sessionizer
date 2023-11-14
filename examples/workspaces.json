@@ -1,0 +1,6 @@
+{
+  "notes": {
+    "directory": ".",
+    "commands": [["python3", "-c", "print('Workspace ready')"]]
+  }
+}
