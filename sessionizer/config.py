@@ -11,6 +11,8 @@ def load(path):
     for name, project in data.items():
         if not isinstance(name, str) or not name or not isinstance(project, dict):
             raise ValueError("Invalid workspace entry")
+        if set(project) - {"directory", "commands"}:
+            raise ValueError("Unknown setting in workspace " + name)
         directory = project.get("directory")
         if not isinstance(directory, str) or not directory:
             raise ValueError("Workspace %s needs a directory" % name)
