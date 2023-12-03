@@ -25,3 +25,10 @@ class ConfigTests(unittest.TestCase):
             path.write_text(json.dumps({"one": {"directory": "absent"}}))
             with self.assertRaises(ValueError):
                 load(path)
+
+    def test_unknown_setting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "config.json"
+            path.write_text(json.dumps({"one": {"directory": ".", "command": []}}))
+            with self.assertRaisesRegex(ValueError, "Unknown setting"):
+                load(path)
